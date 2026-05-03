@@ -705,7 +705,7 @@ classinfo classes[] = {
   {"device", c_device, IS_DISK},
   {"ramdisk", c_ramdisk, IS_DISK},
   {"sdl", c_sdl, N_P | IS_GUI},
-  {"win32", c_win32, N_P | IS_GUI},
+  {"win32", c_sdl, N_P | IS_GUI},
   {"X11", c_x11, N_P | IS_GUI},
   {0, c_none, 0}
 };
