@@ -627,7 +627,7 @@ void bx_sdl_gui_c::dimension_update(unsigned x, unsigned y, unsigned fheight,
 			x, y, SDL_GetError());
 	}
 
-	SDL_SetTextureScaleMode(sdl_texture, SDL_SCALEMODE_NEAREST);
+	SDL_SetTextureScaleMode(sdl_texture, SDL_SCALEMODE_LINEAR);
 
 	res_x = x;
 	res_y = y;
