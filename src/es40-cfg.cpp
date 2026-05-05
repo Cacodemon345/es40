@@ -339,7 +339,7 @@ int main(int argc, char* argv[])
 		vid_linear_q.addAnswer("bilinear", "true", "Bilinear display output");
 		vid_linear_q.setDefault("bilinear");
 
-		os << "  video.linear = " << mem_q.ask() << ";\n";
+		os << "  video.linear = " << vid_linear_q.ask() << ";\n";
 		
 		os << "}\n\n";
 	}
