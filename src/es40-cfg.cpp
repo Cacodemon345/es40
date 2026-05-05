@@ -331,6 +331,16 @@ int main(int argc, char* argv[])
 		 */
 		os << "gui = " << gui_q.getAnswer() << "\n";
 		os << "{\n";
+
+		MultipleChoiceQuestion vid_linear_q;
+		vid_linear_q.setQuestion("Should the display output be nearest or bilinear?");
+		vid_linear_q.setExplanation("This affects the resized display output. Nearest looks pixel-y but harsh, while linear does not look as harsh.");
+		vid_linear_q.addAnswer("nearest", "false", "Nearest display output.");
+		vid_linear_q.addAnswer("bilinear", "true", "Bilinear display output");
+		vid_linear_q.setDefault("bilinear");
+
+		os << "  video.linear = " << mem_q.ask() << ";\n";
+		
 		os << "}\n\n";
 	}
 
