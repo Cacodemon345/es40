@@ -184,24 +184,40 @@ void add_disks(ShrinkingChoiceQuestion* disk_q, ostream* os)
 
 		if (type_q.getAnswer() == "ramdisk")
 		{
-			/* For a RAM DISK, we need to know what
-			 * size it should be.
-			 */
-			MultipleChoiceQuestion unit_q;
-			unit_q.setQuestion("What unit do you want to use to specify the disk size?");
-			unit_q.setExplanation("This is needed to create the RAMDISK.");
-			unit_q.addAnswer("KB", "K", "Kilobytes");
-			unit_q.addAnswer("MB", "M", "Megabytes");
-			unit_q.addAnswer("GB", "G", "Gigabytes");
-			unit_q.setDefault("MB");
-			unit_q.ask();
-			NumberQuestion size_q;
-			size_q.setQuestion("How many " + unit_q.getAnswer() + "Bytes should the disk be?");
-			size_q.setExplanation("This is needed to create the RAMDISK.");
-			size_q.setRange(1, 1024);
-			size_q.setDefault("10");
-			size_q.ask();
-			*os << "      size = \"" << size_q.getAnswer() << unit_q.getAnswer() << "\";\n";
+			cdrom_q.setQuestion("Should " + disk_q->getAnswer() + " be a disk or a read-only in-memory cd-rom device?");
+			cdrom_q.setExplanation("Do you want the OS to see this " + type_q.getAnswer() + " as a hard-disk, or as a read-only in-memory cd-rom?");
+			cdrom_q.addAnswer("disk", "false", "Hard-disk");
+			cdrom_q.addAnswer("cd-rom", "true", "CD-ROM drive");
+			cdrom_q.setDefault("disk");
+			*os << "      cdrom = " << cdrom_q.ask() << ";\n";
+			if (cdrom_q.getAnswer() == "cd-rom" || cdrom_q.getAnswer() == "true")
+			{
+				FreeTextQuestion img_q;
+				img_q.setQuestion("What file should " + disk_q->getAnswer() + " use?");
+				img_q.setExplanation("Enter the path to the file to use for this disk.");
+				*os << "      " << "file = \"" << img_q.ask() << "\";\n";
+			}
+			else
+			{
+				/* For a RAM DISK, we need to know what
+				 * size it should be.
+				 */
+				MultipleChoiceQuestion unit_q;
+				unit_q.setQuestion("What unit do you want to use to specify the disk size?");
+				unit_q.setExplanation("This is needed to create the RAMDISK.");
+				unit_q.addAnswer("KB", "K", "Kilobytes");
+				unit_q.addAnswer("MB", "M", "Megabytes");
+				unit_q.addAnswer("GB", "G", "Gigabytes");
+				unit_q.setDefault("MB");
+				unit_q.ask();
+				NumberQuestion size_q;
+				size_q.setQuestion("How many " + unit_q.getAnswer() + "Bytes should the disk be?");
+				size_q.setExplanation("This is needed to create the RAMDISK.");
+				size_q.setRange(1, 1024);
+				size_q.setDefault("10");
+				size_q.ask();
+				*os << "      size = \"" << size_q.getAnswer() << unit_q.getAnswer() << "\";\n";
+			}
 		}
 
 		/* We also need to know whether this is a

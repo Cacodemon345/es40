@@ -86,7 +86,46 @@ CDiskRam::CDiskRam(CConfigurator* cfg, CSystem* sys, CDiskController* c,
 {
 	byte_size = myCfg->get_num_value("size", false, 512 * 1024 * 1024);
 
-	CHECK_ALLOCATION(ramdisk = malloc((size_t)byte_size));
+	CHECK_ALLOCATION(ramdisk = calloc((size_t)byte_size, 1));
+	auto filename = myCfg->get_text_value("file");
+	model_number = nullptr;
+	if (filename)
+	{
+		FILE* handle = NULL;
+		if (read_only)
+			handle = fopen(filename, "rb");
+		else
+			handle = fopen_large(filename, "rb+");
+		if (handle)
+		{
+			fseek_large(handle, 0, SEEK_END);
+			auto file_byte_size = ftell_large(handle);
+			fseek_large(handle, 0, SEEK_SET);
+			auto original_ramdisk = ramdisk;
+			CHECK_REALLOCATION(ramdisk, realloc(ramdisk, (size_t)file_byte_size), char);
+			byte_size = file_byte_size;
+			fread(ramdisk, 1, (size_t)file_byte_size, handle);
+			fclose(handle);
+
+			model_number = myCfg->get_text_value("model_number", filename);
+
+			// skip to the filename portion of the path.
+			char* p = model_number;
+#if defined(_WIN32)
+			char    x = '\\';
+#elif defined(__VMS)
+			char    x = ']';
+#else
+			char    x = '/';
+#endif
+			while (*p)
+			{
+				if (*p == x)
+					model_number = p + 1;
+				p++;
+			}
+		}
+	}
 
 	state.byte_pos = 0;
 
@@ -96,7 +135,8 @@ CDiskRam::CDiskRam(CConfigurator* cfg, CSystem* sys, CDiskController* c,
 	//calc_cylinders();
 	determine_layout();
 
-	model_number = myCfg->get_text_value("model_number", "ES40RAMDISK");
+	if (!model_number)
+		model_number = myCfg->get_text_value("model_number", "ES40RAMDISK");
 
 	printf("%s: Mounted RAMDISK, %" PRId64 " %zu-byte blocks, %" PRId64 "/%ld/%ld.\n",
 		devid_string, byte_size / state.block_size, state.block_size,
