@@ -27,6 +27,14 @@
 
 #include <algorithm>
 
+#ifndef MAX
+#define MAX(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+
+#ifndef MIN
+#define MIN(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
+
 /* Missing stuff:
    SCTRL_P[12](END|ST)INC
    SCTRL_P1SCTRLD
@@ -504,14 +512,14 @@ void CES1370::es1370_transfer_audio(ES1370State* s, struct chan* d, int loop_sel
     int transferred = 0;
     int index = d - &s->chan[0];
 
-    to_transfer = min(maxb, min(left, csc_bytes));
+    to_transfer = MIN(maxb, MIN(left, csc_bytes));
     addr += (cnt << 2) + d->leftover;
 
     if (index == ADC_CHANNEL) {
         while (to_transfer > 0) {
             int acquired, to_copy;
 
-            to_copy = min(to_transfer, sizeof(tmpbuf));
+            to_copy = MIN(to_transfer, sizeof(tmpbuf));
             //acquired = audio_be_read(s->audio_be, s->adc_voice, tmpbuf, to_copy);
 			acquired = SDL_GetAudioStreamData(s->adc_voice, tmpbuf, to_copy);
             if (!acquired || acquired == -1) {
@@ -530,7 +538,7 @@ void CES1370::es1370_transfer_audio(ES1370State* s, struct chan* d, int loop_sel
         while (to_transfer > 0) {
             int copied, to_copy;
 
-            to_copy = min(to_transfer, sizeof(tmpbuf));
+            to_copy = MIN(to_transfer, sizeof(tmpbuf));
             //pci_dma_read(&s->dev, addr, tmpbuf, to_copy);
 			do_pci_read(addr, tmpbuf, 1, to_copy);
             copied = SDL_PutAudioStreamData(voice, tmpbuf, to_copy) ? to_copy : 0;
