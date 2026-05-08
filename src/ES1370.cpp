@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 // Straight port to es40 by Cacodemon345.
+#ifdef HAVE_SDL
 #include "ES1370.h"
 
 #include <algorithm>
@@ -630,3 +631,4 @@ void CES1370::es1370_dac_callback_adc(void* userdata, SDL_AudioStream* stream, i
     ES1370State* s = &dev->s;
     dev->es1370_run_channel(s, 2, additional_amount);
 }
+#endif HAVE_SDL
