@@ -765,6 +765,7 @@ int main(int argc, char* argv[])
 #endif
 	card_q.addAnswer("scsi", "sym53c810", "Symbios 53C810 narrow SCSI controller");
 	card_q.addAnswer("wide scsi", "sym53c895", "Symbios 53C895 wide SCSI controller (doesn't work with OpenVMS)");
+	card_q.addAnswer("es1370 audio", "es1370", "ES1370 Audio card (works only with Windows NT 4.0)");
 
 	/* Loop until there are no more PCI
 	 * cards to add.
