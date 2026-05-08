@@ -1465,6 +1465,7 @@
     <ClCompile Include="..\Cirrus.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\ES1370.cpp" />
     <ClCompile Include="..\MPU401.cpp" />
     <ClCompile Include="..\Configurator.cpp" />
     <ClCompile Include="..\DEC21143.cpp" />
@@ -1550,6 +1551,7 @@
     <ClInclude Include="..\DMA.h" />
     <ClInclude Include="..\DPR.h" />
     <ClInclude Include="..\emu\emu.h" />
+    <ClInclude Include="..\ES1370.h" />
     <ClInclude Include="..\es40_debug.h" />
     <ClInclude Include="..\es40_endian.h" />
     <ClInclude Include="..\Ethernet.h" />

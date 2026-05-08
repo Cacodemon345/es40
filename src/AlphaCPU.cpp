@@ -726,7 +726,7 @@ void CAlphaCPU::execute()
 	UFP ufp1;
 	UFP ufp2;
 
-	bool pbc;
+	bool pbc = false;
 
 	int opcode;
 	int function;

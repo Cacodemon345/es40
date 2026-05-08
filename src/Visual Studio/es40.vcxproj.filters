@@ -183,6 +183,9 @@
     <ClCompile Include="..\MPU401.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\ES1370.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AliM1543C.h">
@@ -423,6 +426,9 @@
       <Filter>Header Files\base</Filter>
     </ClInclude>
     <ClInclude Include="..\MPU401.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ES1370.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

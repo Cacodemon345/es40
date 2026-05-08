@@ -71,6 +71,7 @@ es40_SOURCES = AliM1543C.cpp \
        DMA.cpp \
        DPR.cpp \
        es40_debug.cpp \
+       ES1370.cpp \
        Ethernet.cpp \
        Flash.cpp \
        FloppyController.cpp \

@@ -149,6 +149,7 @@
 #endif
 #include "Sym53C895.h"
 #include "Sym53C810.h"
+#include "ES1370.h"
 #include "MPU401.h"
 
   /**
@@ -711,6 +712,7 @@ classinfo classes[] = {
   {"win32", c_sdl, N_P | IS_GUI},
   {"X11", c_x11, N_P | IS_GUI},
   {"mpu401", c_mpu401, ON_CS },
+  {"es1370", c_es1370, IS_PCI},
   {0, c_none, 0}
 };
 
@@ -924,6 +926,11 @@ void CConfigurator::initialize()
 //		myDevice = new CCirrus(this, (CSystem*)pParent->get_device(), pcibus,
 //			pcidev);
 //		break;
+
+	case c_es1370:
+		myDevice = new CES1370(this, (CSystem*)pParent->get_device(), pcibus,
+			pcidev);
+		break;
 
 #if defined(HAVE_PCAP)
 
