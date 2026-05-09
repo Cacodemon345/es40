@@ -633,8 +633,8 @@ inline void CAlphaCPU::set_PAL_BASE(u64 pb)
   bool was_vms = state.pal_vms;
 
   // VMS PALcode uses base 0x8000
-  state.pal_vms = (pb == U64(0x8000));
-  //state.pal_vms = false;
+  //state.pal_vms = (pb == U64(0x8000));
+  state.pal_vms = false;
 
 #ifdef DEBUG_PAL
   printf("%%CPU-I-PALSWITCH: PAL=%016" PRIx64 " p21=%016" PRIx64 " p22=%016" PRIx64 " r22=%016" PRIx64 "\n", pb, state.r[53], state.r[54], state.r[22]);
