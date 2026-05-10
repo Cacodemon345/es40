@@ -668,11 +668,12 @@ void CPCIDevice::do_pci_read(u32 address, void* dest, size_t element_size,
 
 			// get a pointer to system memory if the address is inside main memory
 			char* memptr = cSystem->PtrToMem(cur_phys);
+			char* memptr2 = cSystem->PtrToMem(cur_phys + chunk - 1);
 
 			// Copy only within a single translated DMA page. Scatter-gather DMA does
 			// not guarantee that adjacent PCI bus addresses map to contiguous host
 			// physical memory beyond the current page.
-			if (memptr)
+			if (memptr && memptr2)
 			{
 				memcpy(dst, memptr, chunk);
 			}
@@ -776,11 +777,13 @@ void CPCIDevice::do_pci_write(u32 address, void* source, size_t element_size,
 
 			// get a pointer to system memory if the address is inside main memory
 			char* memptr = cSystem->PtrToMem(cur_phys);
+			char* memptr2 = cSystem->PtrToMem(cur_phys + chunk - 1);
 
 			// Copy only within a single translated DMA page. Scatter-gather DMA does
 			// not guarantee that adjacent PCI bus addresses map to contiguous host
 			// physical memory beyond the current page.
-			if (memptr)
+			// Also, make sure we aren't trying to copy past allocated memory.
+			if (memptr && memptr2)
 			{
 				memcpy(memptr, src, chunk);
 			}

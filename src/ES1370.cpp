@@ -425,7 +425,6 @@ uint64_t CES1370::es1370_read(void* opaque, u64 addr, unsigned size)
 
 u32 CES1370::ReadMem_Bar(int func, int bar, u32 address, int dsize)
 {
-	printf("ReadMem_Bar func=%d bar=%d address=0x%08x dsize=%d\n", func, bar, address, dsize);
     if (bar != 0) return ~0U;
     if (dsize < 32) {
         auto val = CES1370::ReadMem_Bar(func, bar, address & ~3, 32);
@@ -457,7 +456,6 @@ void CES1370::WriteMem_Bar(int func, int bar, u32 address, int dsize, u32 data)
 {
     if (bar != 0) return;
 
-	printf("WriteMem_Bar func=%d bar=%d address=0x%08x dsize=%d data=0x%08x\n", func, bar, address, dsize, data);
     if (dsize < 32) {
         auto val = CES1370::ReadMem_Bar(func, bar, address & ~3, 32);
         switch (dsize)
