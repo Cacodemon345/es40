@@ -90,7 +90,7 @@ using namespace std;
  *                of "".
  * \param os:     Output stream for the configuration file.
  **/
-void add_disks(ShrinkingChoiceQuestion* disk_q, ostream* os)
+void add_disks(ShrinkingChoiceQuestion* disk_q, ostream* os, bool floppy = false)
 {
 	/* Loop until there are no more disks to be added.
 	 */
@@ -144,7 +144,13 @@ void add_disks(ShrinkingChoiceQuestion* disk_q, ostream* os)
 			cdrom_q.addAnswer("disk", "false", "Hard-disk");
 			cdrom_q.addAnswer("cd-rom", "true", "CD-ROM drive");
 			cdrom_q.setDefault("disk");
-			*os << "      cdrom = " << cdrom_q.ask() << ";\n";
+			if (floppy)
+			{
+				cdrom_q.setAnswer("false");
+				*os << "      cdrom = " << "false" << ";\n";
+			}
+			else
+				*os << "      cdrom = " << cdrom_q.ask() << ";\n";
 		}
 
 		if (type_q.getAnswer() == "file" && cdrom_q.getAnswer() != "true")
@@ -189,7 +195,13 @@ void add_disks(ShrinkingChoiceQuestion* disk_q, ostream* os)
 			cdrom_q.addAnswer("disk", "false", "Hard-disk");
 			cdrom_q.addAnswer("cd-rom", "true", "CD-ROM drive");
 			cdrom_q.setDefault("disk");
-			*os << "      cdrom = " << cdrom_q.ask() << ";\n";
+			if (floppy)
+			{
+				cdrom_q.setAnswer("false");
+				*os << "      cdrom = " << "false" << ";\n";
+			}
+			else
+				*os << "      cdrom = " << cdrom_q.ask() << ";\n";
 			if (cdrom_q.getAnswer() == "cd-rom" || cdrom_q.getAnswer() == "true")
 			{
 				FreeTextQuestion img_q;
@@ -676,7 +688,7 @@ int main(int argc, char* argv[])
 	os << "  fdc0 = floppy\n";
 	os << "  {\n";
 	/* Ask what disks to add. */
-	add_disks(&fd_q, &os);
+	add_disks(&fd_q, &os, true);
 	os << "  }\n\n";
 
 	/* **************************** *
