@@ -723,7 +723,8 @@ inline int CAlphaCPU::get_icache(u64 address, u32* data)
 
     // Attempt to get a pointer into DRAM. If this is PIO (e.g., TIG flash),
       // PtrToMem returns null and we must *not* try to memcpy from it.
-    if (char* mem = cSystem->PtrToMem(p_a)) {
+    char* mem = cSystem->PtrToMem(p_a);
+    if (mem && cSystem->PtrToMem(p_a + ((ICACHE_LINE_SIZE * 4) - 1))) {
       // DRAM-backed: fill the direct-mapped icache line.
       memcpy(state.icache[i].data, mem, ICACHE_LINE_SIZE * 4);
       state.icache[i].valid = true;
