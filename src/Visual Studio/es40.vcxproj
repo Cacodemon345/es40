@@ -1465,6 +1465,7 @@
     <ClCompile Include="..\Cirrus.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\DMA_new.cpp" />
     <ClCompile Include="..\ES1370.cpp" />
     <ClCompile Include="..\MPU401.cpp" />
     <ClCompile Include="..\Configurator.cpp" />

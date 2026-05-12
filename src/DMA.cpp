@@ -59,6 +59,7 @@
   *
   * \author Camiel Vanderhoeven (camiel@camicom.com / http://www.camicom.com)
   **/
+#if 0
 #include "StdAfx.h"
 #include "System.h"
 #include "DMA.h"
@@ -550,3 +551,4 @@ void CDMA::recv_data(int channel, void* data) {
 		printf("dma: dma requested by device, but controller %d is disabled.\n", ctrlr);
 	}
 }
+#endif

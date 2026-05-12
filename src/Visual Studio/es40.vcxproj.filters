@@ -186,6 +186,9 @@
     <ClCompile Include="..\ES1370.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\DMA_new.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AliM1543C.h">

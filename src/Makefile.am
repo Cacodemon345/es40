@@ -69,6 +69,7 @@ es40_SOURCES = AliM1543C.cpp \
        DiskRam.cpp \
        ibm8514a.cpp \
        DMA.cpp \
+       DMA_new.cpp \
        DPR.cpp \
        es40_debug.cpp \
        ES1370.cpp \
