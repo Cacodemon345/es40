@@ -123,6 +123,11 @@
   **/
 #include "StdAfx.h"
 #include "Disk.h"
+#include "DiskFile.h"
+
+#include <vector>
+
+extern std::vector<CDiskFile*> cd_diskfiles;
 
   /**
    * \brief Constructor.
@@ -158,6 +163,7 @@ CDisk::CDisk(CConfigurator* cfg, CSystem* sys, CDiskController* ctrl,
 
 	state.block_size = is_cdrom ? 2048 : 512;
 	state.scsi.sense.available = false;
+	state.scsi.media_changed = 0;
 
 	myCtrl->register_disk(this, myBus, myDev);
 }
@@ -557,6 +563,8 @@ void CDisk::scsi_xfer_done_me(int bus)
 
 #define SCSICMD_SYNCHRONIZE_CACHE     0x35
 
+#define SCSICMD_GET_EVENT_STATUS_NOTIFICATION 0x4a
+
 //  SCSI block device commands:
 #define SCSIBLOCKCMD_READ_CAPACITY  0x25
 
@@ -600,6 +608,8 @@ void CDisk::scsi_xfer_done_me(int bus)
 #define SCSI_TOO_BIG                - 3 /* Too big for buffer */
 // Per SPC: for malformed RSOC CDB (e.g., wrong reporting option vs opcode type)
 #define SCSI_INVALID_FIELD			- 4 /* Invalid field in CDB */
+#define SCSI_MEDIA_CHANGE           - 5 /* Media changed */
+#define SCSI_MEDIA_REMOVED          - 6 /* Media removed */
 
 void CDisk::do_scsi_error(int errcode)
 {
@@ -666,6 +676,18 @@ void CDisk::do_scsi_error(int errcode)
 		printf("%s: Command returns check sense status (sense: LBA OUT OF RANGE).\n",
 			devid_string);
 #endif
+		break;
+
+	case SCSI_MEDIA_CHANGE:
+		state.scsi.sense.data[2] = 0x06;    // unit attention
+		state.scsi.sense.data[12] = 0x28;   // media changed
+		state.scsi.sense.data[13] = 0x00;
+		break;
+
+	case SCSI_MEDIA_REMOVED:
+		state.scsi.sense.data[2] = 0x02;    // not ready
+		state.scsi.sense.data[12] = 0x3a;   // media not present
+		state.scsi.sense.data[13] = 0x00;
 		break;
 
 	case SCSI_TOO_BIG:
@@ -768,6 +790,11 @@ static inline void put_be32(u8* p, u32 v) {
 
 }
 
+static inline uint16_t read_16bit(const uint8_t* buf)
+{
+	return (buf[0] << 8) | buf[1];
+}
+
 /**
  * \brief Handle a SCSI command.
  *
@@ -818,8 +845,62 @@ int CDisk::do_scsi_command()
 #endif
 
 		// unit is always ready...
+		// ...unless it's a cdrom and the media was changed.
+		if (cdrom()) {
+			if (state.scsi.media_changed == 1) {
+				do_scsi_error(SCSI_MEDIA_REMOVED);
+				state.scsi.media_changed = -1;
+			}
+			else if (state.scsi.media_changed == -1) {
+				do_scsi_error(SCSI_MEDIA_CHANGE);
+				state.scsi.media_changed = 0;
+			}
+		}
 		do_scsi_error(SCSI_OK);
 		break;
+	
+	case SCSICMD_GET_EVENT_STATUS_NOTIFICATION:
+	{
+		if (!cdrom()) {
+			do_scsi_error(SCSI_ILL_CMD);
+			break;
+		}
+		// Straight copied out of Bochs.
+		bool polled = (state.scsi.cmd.data[1] & (1 << 0)) > 0;
+		int event_length, request = state.scsi.cmd.data[4];
+		uint16_t alloc_length = read_16bit(state.scsi.cmd.data + 7);
+		bool inserted = true;
+		if (polled) {
+			// we currently only support the MEDIA event (bit 4)
+			if (request == (1 << 4)) {
+				state.scsi.dati.data[0] = 0;
+				state.scsi.dati.data[1] = 4;  // MEDIA event is 4 bytes long
+				state.scsi.dati.data[2] = (0 << 7) | 4;  // 4 = MEDIA event
+				state.scsi.dati.data[3] = (1 << 4);  // we only support the MEDIA event (bit 4)
+				state.scsi.dati.data[4] =
+					(!state.scsi.media_changed) ? 0 : // Event code: 0 = no change
+					(inserted) ? 4 : 3;      // Event code: 4 = media changed, 3 = removed
+				state.scsi.dati.data[5] =
+					(inserted) ? (1 << 1) : 0; // Media Status (bit 1 = Media Present)
+				state.scsi.dati.data[6] = 0;
+				state.scsi.dati.data[7] = 0;
+				event_length = (alloc_length <= 4) ? 4 : 8;
+			}
+			else {
+				state.scsi.dati.data[0] = 0;
+				state.scsi.dati.data[1] = 0;
+				state.scsi.dati.data[2] = (1 << 7) | (uint8_t)request;
+				state.scsi.dati.data[3] = (1 << 4);  // we only support the MEDIA event (bit 4)
+				event_length = 4;
+			}
+			state.scsi.dati.available = event_length;
+			state.scsi.dati.read = 0;
+			do_scsi_error(SCSI_OK);
+		} else {
+			do_scsi_error(SCSI_INVALID_FIELD);
+		}
+		break;
+	}
 
 	case SCSICMD_REQUEST_SENSE:
 #if defined(DEBUG_SCSI)

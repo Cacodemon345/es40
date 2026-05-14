@@ -70,9 +70,10 @@ public:
   virtual size_t  write_bytes(void* src, size_t bytes);
   virtual void    flush();
 
+  void reload_file(char* filename);
   FILE* get_handle() { return handle; };
 protected:
-  FILE* handle;
-  char* filename;
+  FILE* handle = nullptr;
+  char* filename = nullptr;
 };
 #endif //!defined(__DISKFILE_H__)
