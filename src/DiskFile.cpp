@@ -100,6 +100,39 @@
 #include "StdAfx.h"
 #include "DiskFile.h"
 
+#include <vector>
+std::vector<CDiskFile*> cd_diskfiles;
+
+#ifdef _WIN32
+#include <windows.h>
+#include <commdlg.h>
+
+void win32_select_file(HWND hwnd)
+{
+	OPENFILENAME ofn;
+	char szFileName[MAX_PATH] = "";
+
+	ZeroMemory(&ofn, sizeof(ofn));
+
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hwnd;
+	ofn.lpstrFilter = "ISO Files (*.iso)\0*.iso\0All Files (*.*)\0*.*\0";
+	ofn.lpstrFile = szFileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST;
+	ofn.lpstrDefExt = "iso";
+
+	if (GetOpenFileNameA(&ofn))
+	{
+		if (cd_diskfiles.size() > 0)
+		{
+			printf("Change ISO file to %s\n", szFileName);
+			cd_diskfiles[0]->reload_file(szFileName);
+		}
+	}
+}
+#endif
+
 CDiskFile::CDiskFile(CConfigurator* cfg, CSystem* sys, CDiskController* c,
 	int idebus, int idedev) : CDisk(cfg, sys, c, idebus, idedev)
 {
@@ -109,6 +142,50 @@ CDiskFile::CDiskFile(CConfigurator* cfg, CSystem* sys, CDiskController* c,
 		FAILURE_1(Configuration, "%s: Disk has no file attached!\n", devid_string);
 	}
 
+	reload_file(filename);
+	state.scsi.media_changed = 0;
+
+	model_number = myCfg->get_text_value("model_number", filename);
+
+	// skip to the filename portion of the path.
+	char* p = model_number;
+#if defined(_WIN32)
+	char    x = '\\';
+#elif defined(__VMS)
+	char    x = ']';
+#else
+	char    x = '/';
+#endif
+	while (*p)
+	{
+		if (*p == x)
+			model_number = p + 1;
+		p++;
+	}
+
+	if (cdrom())
+	{
+		printf("CD FILE\n");
+		cd_diskfiles.push_back((CDiskFile*)this);
+	}
+	printf("%s: Mounted file %s, %" PRId64 " %zu-byte blocks, %" PRId64 "/%ld/%ld.\n",
+		devid_string, filename, byte_size / state.block_size, state.block_size,
+		cylinders, heads, sectors);
+}
+
+CDiskFile::~CDiskFile(void)
+{
+	printf("%s: Closing file.\n", devid_string);
+	fclose(handle);
+}
+
+void CDiskFile::reload_file(char* filename)
+{
+	if (handle)
+	{
+		fclose(handle);
+		handle = nullptr;
+	}
 	if (read_only)
 		handle = fopen(filename, "rb");
 	else
@@ -171,34 +248,7 @@ CDiskFile::CDiskFile(CConfigurator* cfg, CSystem* sys, CDiskController* c,
 
 	//calc_cylinders();
 	determine_layout();
-
-	model_number = myCfg->get_text_value("model_number", filename);
-
-	// skip to the filename portion of the path.
-	char* p = model_number;
-#if defined(_WIN32)
-	char    x = '\\';
-#elif defined(__VMS)
-	char    x = ']';
-#else
-	char    x = '/';
-#endif
-	while (*p)
-	{
-		if (*p == x)
-			model_number = p + 1;
-		p++;
-	}
-
-	printf("%s: Mounted file %s, %" PRId64 " %zu-byte blocks, %" PRId64 "/%ld/%ld.\n",
-		devid_string, filename, byte_size / state.block_size, state.block_size,
-		cylinders, heads, sectors);
-}
-
-CDiskFile::~CDiskFile(void)
-{
-	printf("%s: Closing file.\n", devid_string);
-	fclose(handle);
+	state.scsi.media_changed = 1;
 }
 
 bool CDiskFile::seek_byte(off_t_large byte)

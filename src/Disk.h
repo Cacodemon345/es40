@@ -239,6 +239,8 @@ protected:
 
       bool  locked;         /**< Media is locked (for CD-ROM type devices). **/
 
+      int media_changed;
+
       //bool disconnect_priv;       /**< Initiator has allowed us to disconnect/reconnect. **/
       //bool will_disconnect;       /**< We intend to disconnect. **/
       //bool disconnected;          /**< We have disconnected. **/
