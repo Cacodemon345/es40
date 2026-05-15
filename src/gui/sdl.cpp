@@ -445,7 +445,7 @@ void bx_sdl_gui_c::handle_events(void)
 			break;
 		case SDL_EVENT_WINDOW_FOCUS_LOST:
 		{
-			if (sdl_grab && sdl_ignore_next_focus_lost)
+			if (sdl_grab)
 				bx_gui->mouse_enabled_changed(false);
 			break;
 		}
