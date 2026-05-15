@@ -443,7 +443,12 @@ void bx_sdl_gui_c::handle_events(void)
 				}
 			} */
 			break;
-
+		case SDL_EVENT_WINDOW_FOCUS_LOST:
+		{
+			if (sdl_grab && sdl_ignore_next_focus_lost)
+				bx_gui->mouse_enabled_changed(false);
+			break;
+		}
 		case SDL_EVENT_KEY_DOWN:
 			if (sdl_event.key.key == SDLK_END &&
 				(sdl_event.key.mod & SDL_KMOD_CTRL) &&
@@ -501,7 +506,11 @@ void bx_sdl_gui_c::handle_events(void)
 				theKeyboard->gen_scancode(BX_KEY_CTRL_L | BX_KEY_RELEASED);
 				theKeyboard->gen_scancode(BX_KEY_CTRL_R | BX_KEY_RELEASED);
 				
-				win32_select_file((HWND)SDL_GetNumberProperty(SDL_GetWindowProperties(sdl_window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, 0));
+				if (sdl_grab)
+					bx_gui->mouse_enabled_changed(false);
+
+				win32_select_file((HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(sdl_window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+
 				sdl_swallow_keys = true;  // eat subsequent releases
 				break;
 			}
