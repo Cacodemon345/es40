@@ -127,8 +127,11 @@
 
 #if defined(_WIN32) && defined(_MSC_VER)
 typedef size_t        ssize_t;
-typedef int           socklen_t;
 #endif // _WIN32
+
+#if defined(_WIN32)
+typedef int           socklen_t;
+#endif
 
 #if defined(__VMS)
 #define INVALID_SOCKET  - 1
