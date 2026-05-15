@@ -69,6 +69,7 @@
 
 #if defined(HAVE_PCAP)
 #ifdef _WIN32
+#include <winsock.h>
 typedef int          bpf_int32;
 typedef unsigned int bpf_u_int32;
 
