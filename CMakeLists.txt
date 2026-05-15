@@ -66,6 +66,8 @@ target_link_libraries(es40-cfg PRIVATE
     ${ES40_CFG_LIBRARIES}
     )
 
+target_compile_definitions(es40-cfg PUBLIC ${ES40_CFG_DEFINITIONS})
+
 set_property(TARGET es40-cfg PROPERTY CXX_STANDARD 17)
 
 ############################### ES40 ###############################
