@@ -775,7 +775,6 @@ static inline int cdb_len_for_opcode(u8 op)
 	case 0x2A: /* WRITE (10)        */ return 10;
 	case 0x2F: /* VERIFY (10)       */ return 10;
 	case 0x35: /* SYNCHRONIZE CACHE */ return 10;
-		case 0x4a: return 10;
 	case 0x5A: /* MODE SENSE (10)   */ return 10;
 
 		// 12-byte CDBs (supported by this tree)
@@ -849,13 +848,11 @@ int CDisk::do_scsi_command()
 		// ...unless it's a cdrom and the media was changed.
 		if (cdrom()) {
 			if (state.scsi.media_changed == 1) {
-				printf("media removed\n");
 				do_scsi_error(SCSI_MEDIA_REMOVED);
 				state.scsi.media_changed = -1;
 				break;
 			}
 			else if (state.scsi.media_changed == -1) {
-				printf("media changed\n");
 				do_scsi_error(SCSI_MEDIA_CHANGE);
 				state.scsi.media_changed = 0;
 				break;
