@@ -165,8 +165,8 @@ private:
     bool  irq_active;
   } state;
   int listenPort;
-  int listenSocket;
-  int connectSocket;
+  int64_t listenSocket;
+  int64_t connectSocket;
   bool disabled = false;     ///< If true, port is not exposed to guest; reads return 0xff, writes ignored. Used to skip KDCOM probe on AXP64 2210 etc.
   bool raw_mode = false;     ///< If true, skip telnet IAC processing and connect banner. Use for windbg/kgdb where the byte stream must be 8-bit clean.
   bool null_attach = false;  ///< If true, port exists on the bus but no socket is opened and no I/O thread runs.

@@ -21,10 +21,10 @@ endif()
 
 if (NOT ES40_DISABLE_NETWORKING)
     if (WIN32)
-        if (NOT NPCAP_DIR)
-            set(NPCAP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../NPCAP")
-        endif()
-        find_package(NPCap REQUIRED)
+        #if (NOT NPCAP_DIR)
+        #    set(NPCAP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../NPCAP")
+        #endif()
+        #find_package(NPCap REQUIRED)
     else()
         find_package(PCap REQUIRED)
     endif()
@@ -41,10 +41,14 @@ list(APPEND ES40_CFG_SOURCES
     src/base/Exception.cpp
     )
 
+if (WIN32)
+    list(APPEND ES40_CFG_LIBRARIES winmm)
+endif()
+
 if (NOT ES40_DISABLE_NETWORKING)
     list(APPEND ES40_CFG_DEFINITIONS HAVE_PCAP)
     if (WIN32)
-        list(APPEND ES40_CFG_LIBRARIES NPCap::NPCap)
+        #list(APPEND ES40_CFG_LIBRARIES NPCap::NPCap)
     else()
         list(APPEND ES40_CFG_LIBRARIES PCap::PCap)
     endif()
@@ -138,6 +142,7 @@ if (NOT ES40_DISABLE_SDL)
         list(APPEND ES40_SOURCES
             src/gui/gui_win32.cpp
             )
+        list(APPEND ES40_LIBRARIES winmm)
     else()
         list(APPEND ES40_SOURCES
             src/gui/gui_x11.cpp
@@ -148,7 +153,7 @@ endif()
 if (NOT ES40_DISABLE_NETWORKING)
     list(APPEND ES40_DEFINITIONS HAVE_PCAP)
     if (WIN32)
-        list(APPEND ES40_LIBRARIES NPCap::NPCap)
+        # list(APPEND ES40_LIBRARIES NPCap::NPCap)
     else()
         list(APPEND ES40_LIBRARIES PCap::PCap)
     endif()

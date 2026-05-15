@@ -242,7 +242,7 @@ private:
 
   void applyPriority()
   {
-    HANDLE h = static_cast<HANDLE>(_thread.native_handle());
+    HANDLE h = (HANDLE)(_thread.native_handle());
     if (!SetThreadPriority(h, mapPrioWin32(_prio)))
       printf("Warning: SetThreadPriority failed for thread '%s' (error %lu)\n",
         _name.c_str(), GetLastError());

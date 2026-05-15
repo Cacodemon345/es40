@@ -308,21 +308,7 @@
             /* #undef inline */
 #endif
 
-/* Define to the type of a signed integer type of width exactly 16 bits if
-   such a type exists and the standard includes do not define it. */
-typedef signed __int16 int16_t;
-
-/* Define to the type of a signed integer type of width exactly 32 bits if
-   such a type exists and the standard includes do not define it. */
-typedef signed __int32 int32_t;
-
-/* Define to the type of a signed integer type of width exactly 64 bits if
-   such a type exists and the standard includes do not define it. */
-typedef signed __int64 int64_t;
-
-/* Define to the type of a signed integer type of width exactly 8 bits if such
-   a type exists and the standard includes do not define it. */
-typedef signed __int8 int8_t;
+#include <stdint.h>
 
 /* Define to rpl_malloc if the replacement function should be used. */
 /* #undef malloc */
@@ -338,22 +324,6 @@ typedef signed __int8 int8_t;
 
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef ssize_t */
-
-/* Define to the type of an unsigned integer type of width exactly 16 bits if
-   such a type exists and the standard includes do not define it. */
-typedef unsigned __int16 uint16_t;
-
-/* Define to the type of an unsigned integer type of width exactly 32 bits if
-   such a type exists and the standard includes do not define it. */
-typedef unsigned __int32 uint32_t;
-
-/* Define to the type of an unsigned integer type of width exactly 64 bits if
-   such a type exists and the standard includes do not define it. */
-typedef unsigned __int64 uint64_t;
-
-/* Define to the type of an unsigned integer type of width exactly 8 bits if
-   such a type exists and the standard includes do not define it. */
-typedef unsigned __int8 uint8_t;
 
 /* Define as `fork' if `vfork' does not work. */
 /* #undef vfork */

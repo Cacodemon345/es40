@@ -196,4 +196,4 @@ private:
   static void es1370_dac_callback_dac2(void* userdata, SDL_AudioStream* stream, int additional_amount, int total_amount);
   static void es1370_dac_callback_adc(void* userdata, SDL_AudioStream* stream, int additional_amount, int total_amount);
 };
-#endif HAVE_SDL
+#endif /* HAVE_SDL */

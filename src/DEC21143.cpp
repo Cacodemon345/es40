@@ -418,11 +418,80 @@ u32             dec21143_cfg_mask[64] = {
 
 int CDEC21143::nic_num = 0;
 
+#ifdef _WIN32
+/* Pointers to the real functions. */
+static const char *(*f_pcap_lib_version)(void);
+static int (*f_pcap_findalldevs)(pcap_if_t **, char *);
+static void (*f_pcap_freealldevs)(void *);
+static pcap_t* (*f_pcap_open_live)(const char *, int, int, int, char *);
+static int (*f_pcap_compile)(void *, void *, const char *, int, bpf_u_int32);
+static int (*f_pcap_setfilter)(void *, void *);
+static const unsigned char
+    *(*f_pcap_next)(void *, void *);
+static int (*f_pcap_sendpacket)(void *, const unsigned char *, int);
+static void (*f_pcap_close)(void *);
+static int (*f_pcap_setnonblock)(void *, int, char *);
+static int (*f_pcap_set_immediate_mode)(void *, int);
+static int (*f_pcap_set_promisc)(void *, int);
+static int (*f_pcap_set_snaplen)(void *, int);
+static int (*f_pcap_dispatch)(void *, int, pcap_handler callback, unsigned char *user);
+static void *(*f_pcap_create)(const char *, char *);
+static int (*f_pcap_activate)(void *);
+static void *(*f_pcap_geterr)(void *);
+static pcap_t* (*f_pcap_open)(const char *source, int snaplen, int flags, int read_timeout, struct pcap_rmtauth *auth, char *errbuf);
+static int (*f_pcap_next_ex)(pcap_t *, struct pcap_pkthdr **, const unsigned char **);
+#endif
+
 /**
  * Constructor.
  **/
 CDEC21143::CDEC21143(CConfigurator* confg, CSystem* c, int pcibus, int pcidev) : CPCIDevice(confg, c, pcibus, pcidev), mySemaphore(0, 1)
 {
+#ifdef _WIN32
+	{
+	    char npcap_dir[512];
+    	GetSystemDirectoryA(npcap_dir, 480);
+    	strcat(npcap_dir, "\\Npcap");
+    	SetDllDirectoryA(npcap_dir);	
+		auto libhandle = LoadLibraryA("wpcap.dll");
+    	SetDllDirectoryA(NULL); /* reset the DLL search path */
+		if (!libhandle) {
+			FAILURE(Runtime, "Failed to load wpcap.dll");
+		}
+		f_pcap_lib_version = (const char *(*)())GetProcAddress(libhandle, "pcap_lib_version");
+		f_pcap_findalldevs = (int (*)(pcap_if_t **, char *))GetProcAddress(libhandle, "pcap_findalldevs");
+		f_pcap_freealldevs = (void (*)(void *))GetProcAddress(libhandle, "pcap_freealldevs");
+		f_pcap_open_live   = (pcap_t *(*)(const char *, int, int, int, char *))GetProcAddress(libhandle, "pcap_open_live");
+		f_pcap_open   = (pcap_t* (*)(const char *, int , int , int , pcap_rmtauth *, char *))GetProcAddress(libhandle, "pcap_open");
+		f_pcap_compile = (int (*)(void *, void *, const char *, int, bpf_u_int32))GetProcAddress(libhandle, "pcap_compile");
+		f_pcap_setfilter = (int (*)(void *, void *))GetProcAddress(libhandle, "pcap_setfilter");
+		f_pcap_next = (const unsigned char *(*)(void *, void *))GetProcAddress(libhandle, "pcap_next");
+		f_pcap_sendpacket = (int (*)(void *, const unsigned char *, int))GetProcAddress(libhandle, "pcap_sendpacket");
+		f_pcap_close = (void (*)(void *))GetProcAddress(libhandle, "pcap_close");
+		f_pcap_setnonblock = (int (*)(void *, int, char *))GetProcAddress(libhandle, "pcap_setnonblock");
+		f_pcap_set_immediate_mode = (int (*)(void *, int))GetProcAddress(libhandle, "pcap_set_immediate_mode");
+		f_pcap_set_promisc = (int (*)(void *, int))GetProcAddress(libhandle, "pcap_set_promisc");
+		f_pcap_set_snaplen = (int (*)(void *, int))GetProcAddress(libhandle, "pcap_set_snaplen");
+		f_pcap_dispatch = (int (*)(void *, int, pcap_handler callback, unsigned char *user))GetProcAddress(libhandle, "pcap_dispatch");
+		f_pcap_create = (void * (*)(const char *, char *))GetProcAddress(libhandle, "pcap_create");
+		f_pcap_geterr = (void *(*)(void *))GetProcAddress(libhandle, "pcap_geterr");
+		f_pcap_next_ex = (int (*)(pcap *, pcap_pkthdr **, const unsigned char **))GetProcAddress(libhandle, "pcap_next_ex");
+
+		#define pcap_findalldevs f_pcap_findalldevs
+		#define pcap_open f_pcap_open
+		#define pcap_sendpacket f_pcap_sendpacket
+		#define pcap_close f_pcap_close
+		#define pcap_setnonblock f_pcap_setnonblock
+		#define pcap_setfilter f_pcap_setfilter
+		#define pcap_compile f_pcap_compile
+		#define pcap_geterr f_pcap_geterr
+		#define pcap_next_ex f_pcap_next_ex
+
+		#define PCAP_ERROR -1
+		#define PCAP_OPENFLAG_PROMISCUOUS 0x00000001
+		#define PCAP_OPENFLAG_NOCAPTURE_LOCAL 0x00000008
+	}
+#endif
 }
 
 /**
@@ -433,8 +502,8 @@ void CDEC21143::init()
 	pcap_if_t* alldevs;
 
 	pcap_if_t* d;
-	u_int       inum;
-	u_int       i = 0;
+	unsigned int inum;
+	unsigned int i = 0;
 	char        errbuf[PCAP_ERRBUF_SIZE];
 	char* cfg;
 
@@ -477,13 +546,13 @@ void CDEC21143::init()
 				if (fgets(input_buf, sizeof(input_buf), stdin) == NULL)
 					FAILURE(Runtime, "Unexpected end of input while selecting network interface");
 
-				if (sscanf(input_buf, "%d", &parsed) != 1 || parsed < 1 || (u_int)parsed > i)
+				if (sscanf(input_buf, "%d", &parsed) != 1 || parsed < 1 || (unsigned int)parsed > i)
 				{
 					printf("%%NIC-W-BADSEL: Invalid selection. Please enter a number between 1 and %d.\n", i);
 					continue;
 				}
 
-				inum = (u_int)parsed;
+				inum = (unsigned int)parsed;
 				break;
 			}
 		}
@@ -507,7 +576,7 @@ void CDEC21143::init()
 	//            and will panic on startup and abort.
 	//    4. Libpcap doesn't reflect packets, and we want winpcap/libpcap processing to be identical.
 	// Loopback packets are handled via direct entry in the receive queue.
-	if ((fp = pcap_open(cfg, 65536 /*snaplen: capture entire packets */,
+	if ((fp = (pcap_t*)pcap_open(cfg, 65536 /*snaplen: capture entire packets */,
 		PCAP_OPENFLAG_PROMISCUOUS | PCAP_OPENFLAG_NOCAPTURE_LOCAL /*promiscuous */,
 		10 /*packet buffer timeout: [ms] */, 0 /* auth structure */, errbuf)) == NULL) // connect to pcap...
 #else
@@ -682,7 +751,7 @@ void CDEC21143::check_state()
 void CDEC21143::receive_process()
 {
 	struct pcap_pkthdr* packet_header;
-	const u_char* packet_data = NULL;
+	const unsigned char* packet_data = NULL;
 
 	// if receive process active
 	if (state.reg[CSR_OPMODE / 8] & OPMODE_SR)

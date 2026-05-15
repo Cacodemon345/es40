@@ -41,12 +41,12 @@
 #include "telnet.h"
 
 #if defined(IDB) && (defined(LS_MASTER) || defined(LS_SLAVE))
-extern int  ls_Socket;
+extern int64_t  ls_Socket;
 
 #if defined(LS_MASTER)
 extern char ls_IP[30];
 #else
-extern int  ls_listenSocket;
+extern int64_t  ls_listenSocket;
 #endif
 void        lockstep_init();
 void        lockstep_sync_m2s(const char* s);

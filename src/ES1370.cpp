@@ -484,12 +484,6 @@ void CES1370::WriteMem_Bar(int func, int bar, u32 address, int dsize, u32 data)
         es1370_write(&s, address, data, dsize);
         return;
     }
-
-    if (dsize == 64) {
-        es1370_write(&s, address, data & 0xffffffff, 32);
-        es1370_write(&s, address + 4, data >> 32, 32);
-        return;
-	}
 }
 
 void CES1370::es1370_transfer_audio(ES1370State* s, struct chan* d, int loop_sel,
@@ -637,4 +631,4 @@ void CES1370::es1370_dac_callback_adc(void* userdata, SDL_AudioStream* stream, i
     ES1370State* s = &dev->s;
     dev->es1370_run_channel(s, 2, additional_amount);
 }
-#endif HAVE_SDL
+#endif /* HAVE_SDL */

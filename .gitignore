@@ -434,3 +434,8 @@ src/es40_idb
 src/es40_cfg
 src/es40_lss
 src/es40_lsm
+
+build
+build/
+build/*
+.vscode

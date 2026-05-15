@@ -96,10 +96,68 @@
 #include "DEC21143_tulipreg.h"
 #if defined(WIN32)
 #define HAVE_REMOTE
-#endif
+#else
 #include <pcap.h>
+#endif
 #include "Ethernet.h"
 #include "base/Semaphore.h"
+
+#if defined(WIN32)
+typedef int          bpf_int32;
+typedef unsigned int bpf_u_int32;
+
+/*
+ * The instruction data structure.
+ */
+struct bpf_insn {
+    unsigned short code;
+    unsigned char  jt;
+    unsigned char  jf;
+    bpf_u_int32    k;
+};
+
+/*
+ * Structure for "pcap_compile()", "pcap_setfilter()", etc..
+ */
+struct bpf_program {
+    unsigned int     bf_len;
+    struct bpf_insn *bf_insns;
+};
+
+typedef struct pcap_if pcap_if_t;
+
+#    define PCAP_ERRBUF_SIZE 256
+
+struct pcap_pkthdr {
+    struct timeval ts;
+    bpf_u_int32    caplen;
+    bpf_u_int32    len;
+};
+
+struct pcap_if {
+    struct pcap_if *next;
+    char           *name;
+    char           *description;
+    void           *addresses;
+    bpf_u_int32     flags;
+};
+
+struct pcap_send_queue {
+    unsigned int maxlen; /* Maximum size of the queue, in bytes. This
+             variable contains the size of the buffer field. */
+    unsigned int len;    /* Current size of the queue, in bytes. */
+    char *buffer; /* Buffer containing the packets to be sent. */
+};
+
+typedef struct pcap_send_queue pcap_send_queue;
+
+typedef void (*pcap_handler)(unsigned char *user, const struct pcap_pkthdr *h, const unsigned char *bytes);
+
+typedef struct pcap pcap_t;
+typedef struct pcap_dumper pcap_dumper_t;
+typedef struct pcap_if pcap_if_t;
+typedef struct pcap_addr pcap_addr_t;
+#endif
 
   /**
    * \brief Emulated DEC 21143 NIC device.

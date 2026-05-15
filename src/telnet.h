@@ -126,7 +126,6 @@
 #endif
 
 #if defined(_WIN32) && !defined(__GNUWIN32__)
-typedef size_t        ssize_t;
 typedef int           socklen_t;
 #endif // _WIN32
 

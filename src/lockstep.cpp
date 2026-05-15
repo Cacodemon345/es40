@@ -46,12 +46,12 @@
 #include "lockstep.h"
 
 #if defined(IDB) && (defined(LS_MASTER) || defined(LS_SLAVE))
-int   ls_Socket;
+int64_t   ls_Socket;
 
 #if defined(LS_MASTER)
 char  ls_IP[30];
 #else
-int   ls_listenSocket;
+int64_t   ls_listenSocket;
 #endif
 void lockstep_init()
 {

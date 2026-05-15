@@ -53,7 +53,7 @@ public:
     c->RegisterMemory(this, 1, U64(0x00000801fc000331), 1);
   }
 
-  virtual CMPU401::~CMPU401()
+  virtual ~CMPU401()
   {
     midiOutClose(hmo);
   }

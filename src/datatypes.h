@@ -111,7 +111,7 @@
 
 #if defined(_WIN32) && !defined(__GNUWIN32__)
 
-#define U64(a)  a##ui64
+#define U64(a)  a##ull
 
 #else // defined(_WIN32)
 
