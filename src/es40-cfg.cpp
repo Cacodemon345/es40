@@ -1013,6 +1013,49 @@ int main(int argc, char* argv[])
 	usb_q.setDefault("yes");
 	usb_q.ask();
 
+	MultipleChoiceQuestion arc_compat_q;
+	arc_compat_q.setQuestion("Which OS the reported year should be compatible with?");
+	arc_compat_q.setExplanation("This only affects the year reported to the guest. Use \"nt\" if planning to run Windows OSes.");
+	arc_compat_q.addAnswer("nt", "true", "Report the year as an offset from 1980, as expected by Windows OSes and AlphaBIOS.");
+	arc_compat_q.addAnswer("vms", "false", "Report the year as expected by OpenVMS, Tru64 UNIX, Linux and BSDs.");
+	arc_compat_q.setDefault("vms");
+	arc_compat_q.ask();
+	os << "\n  arc_year_compat = " << arc_compat_q.ask() << ";\n\n";
+
+	MultipleChoiceQuestion time_q;
+	time_q.setQuestion("Do you want to set a fixed date and time when the VM starts?");
+	time_q.setExplanation("By default, the VM's date and time is initialized to the current host date and time at startup. If you want to set a fixed date and time instead, you can do so here.");
+	time_q.addAnswer("yes", "true", "Set a fixed date and time");
+	time_q.addAnswer("no", "false", "Initialize the VM's date and time to the current host date and time at startup");
+	time_q.setDefault("no");
+	time_q.ask();
+
+	if (time_q.getAnswer() == "yes")
+	{
+		for (;;)
+		{
+			FreeTextQuestion datetime_q;
+			datetime_q.setQuestion("What date and time should the VM have at startup? (format: YYYY-MM-DD HH:MM:SS)");
+			datetime_q.setExplanation("Enter the date and time in the format shown above. For example, '2000-01-01 12:00:00' for January 1st, 2000 at noon.");
+			datetime_q.ask();
+			struct tm ft = {};
+			int n = sscanf(datetime_q.getAnswer().c_str(), "%d-%d-%d %d:%d:%d",
+				&ft.tm_year, &ft.tm_mon, &ft.tm_mday,
+				&ft.tm_hour, &ft.tm_min, &ft.tm_sec);
+			if (n < 3) {
+				cout << "\nInvalid date/time format.\n";
+				continue;
+			}
+			std::string datestr = i2s(ft.tm_year) + "-" + i2s(ft.tm_mon) + "-" + i2s(ft.tm_mday);
+			if (n >= 4) datestr += " " + i2s(ft.tm_hour);
+			if (n >= 5) datestr += ":" + i2s(ft.tm_min);
+			if (n >= 6) datestr += ":" + i2s(ft.tm_sec);
+			os << "  time = \"" << datestr << "\";\n\n";
+			break;
+		}
+	}
+
+
 	os << "  pci0.7 = ali\n";
 	os << "  {\n";
 	os << "    mouse.enabled = " << mouse_q.getAnswer() << ";\n";
