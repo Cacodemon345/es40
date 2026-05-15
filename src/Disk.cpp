@@ -849,11 +849,13 @@ int CDisk::do_scsi_command()
 		// ...unless it's a cdrom and the media was changed.
 		if (cdrom()) {
 			if (state.scsi.media_changed == 1) {
+				printf("media removed\n");
 				do_scsi_error(SCSI_MEDIA_REMOVED);
 				state.scsi.media_changed = -1;
 				break;
 			}
 			else if (state.scsi.media_changed == -1) {
+				printf("media changed\n");
 				do_scsi_error(SCSI_MEDIA_CHANGE);
 				state.scsi.media_changed = 0;
 				break;
@@ -909,6 +911,20 @@ int CDisk::do_scsi_command()
 #if defined(DEBUG_SCSI)
 		printf("%s: REQUEST SENSE.\n", devid_string);
 #endif
+		if (cdrom()) {
+			if (state.scsi.media_changed == 1) {
+				printf("media removed (req sense)\n");
+				do_scsi_error(SCSI_MEDIA_REMOVED);
+				state.scsi.media_changed = -1;
+				break;
+			}
+			else if (state.scsi.media_changed == -1) {
+				printf("media changed (req sense)\n");
+				do_scsi_error(SCSI_MEDIA_CHANGE);
+				state.scsi.media_changed = 0;
+				break;
+			}
+		}
 		retlen = state.scsi.cmd.data[4];
 
 		//    FAILURE("Sense requested");
