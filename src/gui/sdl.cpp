@@ -233,132 +233,132 @@ void bx_sdl_gui_c::graphics_tile_update_in_place(unsigned x0, unsigned y0,
 	//
 }
 
-static u32 sdl_sym_to_bx_key(SDL_Keycode sym)
+static u32 sdl_scan_to_bx_key(SDL_Scancode sym)
 {
 	switch (sym)
 	{
-	case SDLK_BACKSPACE:    return BX_KEY_BACKSPACE;
-	case SDLK_TAB:          return BX_KEY_TAB;
-	case SDLK_RETURN:       return BX_KEY_ENTER;
-	case SDLK_PAUSE:        return BX_KEY_PAUSE;
-	case SDLK_ESCAPE:       return BX_KEY_ESC;
-	case SDLK_SPACE:        return BX_KEY_SPACE;
-	case SDLK_APOSTROPHE:   return BX_KEY_SINGLE_QUOTE;
-	case SDLK_COMMA:        return BX_KEY_COMMA;
-	case SDLK_MINUS:        return BX_KEY_MINUS;
-	case SDLK_PERIOD:       return BX_KEY_PERIOD;
-	case SDLK_SLASH:        return BX_KEY_SLASH;
+	case SDL_SCANCODE_BACKSPACE:    return BX_KEY_BACKSPACE;
+	case SDL_SCANCODE_TAB:          return BX_KEY_TAB;
+	case SDL_SCANCODE_RETURN:       return BX_KEY_ENTER;
+	case SDL_SCANCODE_PAUSE:        return BX_KEY_PAUSE;
+	case SDL_SCANCODE_ESCAPE:       return BX_KEY_ESC;
+	case SDL_SCANCODE_SPACE:        return BX_KEY_SPACE;
+	case SDL_SCANCODE_APOSTROPHE:   return BX_KEY_SINGLE_QUOTE;
+	case SDL_SCANCODE_COMMA:        return BX_KEY_COMMA;
+	case SDL_SCANCODE_MINUS:        return BX_KEY_MINUS;
+	case SDL_SCANCODE_PERIOD:       return BX_KEY_PERIOD;
+	case SDL_SCANCODE_SLASH:        return BX_KEY_SLASH;
 
-	case SDLK_0:            return BX_KEY_0;
-	case SDLK_1:            return BX_KEY_1;
-	case SDLK_2:            return BX_KEY_2;
-	case SDLK_3:            return BX_KEY_3;
-	case SDLK_4:            return BX_KEY_4;
-	case SDLK_5:            return BX_KEY_5;
-	case SDLK_6:            return BX_KEY_6;
-	case SDLK_7:            return BX_KEY_7;
-	case SDLK_8:            return BX_KEY_8;
-	case SDLK_9:            return BX_KEY_9;
+	case SDL_SCANCODE_0:            return BX_KEY_0;
+	case SDL_SCANCODE_1:            return BX_KEY_1;
+	case SDL_SCANCODE_2:            return BX_KEY_2;
+	case SDL_SCANCODE_3:            return BX_KEY_3;
+	case SDL_SCANCODE_4:            return BX_KEY_4;
+	case SDL_SCANCODE_5:            return BX_KEY_5;
+	case SDL_SCANCODE_6:            return BX_KEY_6;
+	case SDL_SCANCODE_7:            return BX_KEY_7;
+	case SDL_SCANCODE_8:            return BX_KEY_8;
+	case SDL_SCANCODE_9:            return BX_KEY_9;
 
-	case SDLK_SEMICOLON:    return BX_KEY_SEMICOLON;
-	case SDLK_EQUALS:       return BX_KEY_EQUALS;
+	case SDL_SCANCODE_SEMICOLON:    return BX_KEY_SEMICOLON;
+	case SDL_SCANCODE_EQUALS:       return BX_KEY_EQUALS;
 
-	case SDLK_LEFTBRACKET:  return BX_KEY_LEFT_BRACKET;
-	case SDLK_BACKSLASH:    return BX_KEY_BACKSLASH;
-	case SDLK_RIGHTBRACKET: return BX_KEY_RIGHT_BRACKET;
-	case SDLK_GRAVE:        return BX_KEY_GRAVE;
+	case SDL_SCANCODE_LEFTBRACKET:  return BX_KEY_LEFT_BRACKET;
+	case SDL_SCANCODE_BACKSLASH:    return BX_KEY_BACKSLASH;
+	case SDL_SCANCODE_RIGHTBRACKET: return BX_KEY_RIGHT_BRACKET;
+	case SDL_SCANCODE_GRAVE:        return BX_KEY_GRAVE;
 
-	case SDLK_A:            return BX_KEY_A;
-	case SDLK_B:            return BX_KEY_B;
-	case SDLK_C:            return BX_KEY_C;
-	case SDLK_D:            return BX_KEY_D;
-	case SDLK_E:            return BX_KEY_E;
-	case SDLK_F:            return BX_KEY_F;
-	case SDLK_G:            return BX_KEY_G;
-	case SDLK_H:            return BX_KEY_H;
-	case SDLK_I:            return BX_KEY_I;
-	case SDLK_J:            return BX_KEY_J;
-	case SDLK_K:            return BX_KEY_K;
-	case SDLK_L:            return BX_KEY_L;
-	case SDLK_M:            return BX_KEY_M;
-	case SDLK_N:            return BX_KEY_N;
-	case SDLK_O:            return BX_KEY_O;
-	case SDLK_P:            return BX_KEY_P;
-	case SDLK_Q:            return BX_KEY_Q;
-	case SDLK_R:            return BX_KEY_R;
-	case SDLK_S:            return BX_KEY_S;
-	case SDLK_T:            return BX_KEY_T;
-	case SDLK_U:            return BX_KEY_U;
-	case SDLK_V:            return BX_KEY_V;
-	case SDLK_W:            return BX_KEY_W;
-	case SDLK_X:            return BX_KEY_X;
-	case SDLK_Y:            return BX_KEY_Y;
-	case SDLK_Z:            return BX_KEY_Z;
+	case SDL_SCANCODE_A:            return BX_KEY_A;
+	case SDL_SCANCODE_B:            return BX_KEY_B;
+	case SDL_SCANCODE_C:            return BX_KEY_C;
+	case SDL_SCANCODE_D:            return BX_KEY_D;
+	case SDL_SCANCODE_E:            return BX_KEY_E;
+	case SDL_SCANCODE_F:            return BX_KEY_F;
+	case SDL_SCANCODE_G:            return BX_KEY_G;
+	case SDL_SCANCODE_H:            return BX_KEY_H;
+	case SDL_SCANCODE_I:            return BX_KEY_I;
+	case SDL_SCANCODE_J:            return BX_KEY_J;
+	case SDL_SCANCODE_K:            return BX_KEY_K;
+	case SDL_SCANCODE_L:            return BX_KEY_L;
+	case SDL_SCANCODE_M:            return BX_KEY_M;
+	case SDL_SCANCODE_N:            return BX_KEY_N;
+	case SDL_SCANCODE_O:            return BX_KEY_O;
+	case SDL_SCANCODE_P:            return BX_KEY_P;
+	case SDL_SCANCODE_Q:            return BX_KEY_Q;
+	case SDL_SCANCODE_R:            return BX_KEY_R;
+	case SDL_SCANCODE_S:            return BX_KEY_S;
+	case SDL_SCANCODE_T:            return BX_KEY_T;
+	case SDL_SCANCODE_U:            return BX_KEY_U;
+	case SDL_SCANCODE_V:            return BX_KEY_V;
+	case SDL_SCANCODE_W:            return BX_KEY_W;
+	case SDL_SCANCODE_X:            return BX_KEY_X;
+	case SDL_SCANCODE_Y:            return BX_KEY_Y;
+	case SDL_SCANCODE_Z:            return BX_KEY_Z;
 
-	case SDLK_DELETE:       return BX_KEY_DELETE;
+	case SDL_SCANCODE_DELETE:       return BX_KEY_DELETE;
 
 		// Keypad
-	case SDLK_KP_0:         return BX_KEY_KP_INSERT;
-	case SDLK_KP_1:         return BX_KEY_KP_END;
-	case SDLK_KP_2:         return BX_KEY_KP_DOWN;
-	case SDLK_KP_3:         return BX_KEY_KP_PAGE_DOWN;
-	case SDLK_KP_4:         return BX_KEY_KP_LEFT;
-	case SDLK_KP_5:         return BX_KEY_KP_5;
-	case SDLK_KP_6:         return BX_KEY_KP_RIGHT;
-	case SDLK_KP_7:         return BX_KEY_KP_HOME;
-	case SDLK_KP_8:         return BX_KEY_KP_UP;
-	case SDLK_KP_9:         return BX_KEY_KP_PAGE_UP;
-	case SDLK_KP_PERIOD:    return BX_KEY_KP_DELETE;
-	case SDLK_KP_DIVIDE:    return BX_KEY_KP_DIVIDE;
-	case SDLK_KP_MULTIPLY:  return BX_KEY_KP_MULTIPLY;
-	case SDLK_KP_MINUS:     return BX_KEY_KP_SUBTRACT;
-	case SDLK_KP_PLUS:      return BX_KEY_KP_ADD;
-	case SDLK_KP_ENTER:     return BX_KEY_KP_ENTER;
+	case SDL_SCANCODE_KP_0:         return BX_KEY_KP_INSERT;
+	case SDL_SCANCODE_KP_1:         return BX_KEY_KP_END;
+	case SDL_SCANCODE_KP_2:         return BX_KEY_KP_DOWN;
+	case SDL_SCANCODE_KP_3:         return BX_KEY_KP_PAGE_DOWN;
+	case SDL_SCANCODE_KP_4:         return BX_KEY_KP_LEFT;
+	case SDL_SCANCODE_KP_5:         return BX_KEY_KP_5;
+	case SDL_SCANCODE_KP_6:         return BX_KEY_KP_RIGHT;
+	case SDL_SCANCODE_KP_7:         return BX_KEY_KP_HOME;
+	case SDL_SCANCODE_KP_8:         return BX_KEY_KP_UP;
+	case SDL_SCANCODE_KP_9:         return BX_KEY_KP_PAGE_UP;
+	case SDL_SCANCODE_KP_PERIOD:    return BX_KEY_KP_DELETE;
+	case SDL_SCANCODE_KP_DIVIDE:    return BX_KEY_KP_DIVIDE;
+	case SDL_SCANCODE_KP_MULTIPLY:  return BX_KEY_KP_MULTIPLY;
+	case SDL_SCANCODE_KP_MINUS:     return BX_KEY_KP_SUBTRACT;
+	case SDL_SCANCODE_KP_PLUS:      return BX_KEY_KP_ADD;
+	case SDL_SCANCODE_KP_ENTER:     return BX_KEY_KP_ENTER;
 
 		// Arrows + Home/End pad
-	case SDLK_UP:           return BX_KEY_UP;
-	case SDLK_DOWN:         return BX_KEY_DOWN;
-	case SDLK_RIGHT:        return BX_KEY_RIGHT;
-	case SDLK_LEFT:         return BX_KEY_LEFT;
-	case SDLK_INSERT:       return BX_KEY_INSERT;
-	case SDLK_HOME:         return BX_KEY_HOME;
-	case SDLK_END:          return BX_KEY_END;
-	case SDLK_PAGEUP:       return BX_KEY_PAGE_UP;
-	case SDLK_PAGEDOWN:     return BX_KEY_PAGE_DOWN;
+	case SDL_SCANCODE_UP:           return BX_KEY_UP;
+	case SDL_SCANCODE_DOWN:         return BX_KEY_DOWN;
+	case SDL_SCANCODE_RIGHT:        return BX_KEY_RIGHT;
+	case SDL_SCANCODE_LEFT:         return BX_KEY_LEFT;
+	case SDL_SCANCODE_INSERT:       return BX_KEY_INSERT;
+	case SDL_SCANCODE_HOME:         return BX_KEY_HOME;
+	case SDL_SCANCODE_END:          return BX_KEY_END;
+	case SDL_SCANCODE_PAGEUP:       return BX_KEY_PAGE_UP;
+	case SDL_SCANCODE_PAGEDOWN:     return BX_KEY_PAGE_DOWN;
 
 		// Function keys
-	case SDLK_F1:           return BX_KEY_F1;
-	case SDLK_F2:           return BX_KEY_F2;
-	case SDLK_F3:           return BX_KEY_F3;
-	case SDLK_F4:           return BX_KEY_F4;
-	case SDLK_F5:           return BX_KEY_F5;
-	case SDLK_F6:           return BX_KEY_F6;
-	case SDLK_F7:           return BX_KEY_F7;
-	case SDLK_F8:           return BX_KEY_F8;
-	case SDLK_F9:           return BX_KEY_F9;
-	case SDLK_F10:          return BX_KEY_F10;
-	case SDLK_F11:          return BX_KEY_F11;
-	case SDLK_F12:          return BX_KEY_F12;
+	case SDL_SCANCODE_F1:           return BX_KEY_F1;
+	case SDL_SCANCODE_F2:           return BX_KEY_F2;
+	case SDL_SCANCODE_F3:           return BX_KEY_F3;
+	case SDL_SCANCODE_F4:           return BX_KEY_F4;
+	case SDL_SCANCODE_F5:           return BX_KEY_F5;
+	case SDL_SCANCODE_F6:           return BX_KEY_F6;
+	case SDL_SCANCODE_F7:           return BX_KEY_F7;
+	case SDL_SCANCODE_F8:           return BX_KEY_F8;
+	case SDL_SCANCODE_F9:           return BX_KEY_F9;
+	case SDL_SCANCODE_F10:          return BX_KEY_F10;
+	case SDL_SCANCODE_F11:          return BX_KEY_F11;
+	case SDL_SCANCODE_F12:          return BX_KEY_F12;
 
 		// Modifier keys
-	case SDLK_NUMLOCKCLEAR: return BX_KEY_NUM_LOCK;
-	case SDLK_CAPSLOCK:     return BX_KEY_CAPS_LOCK;
-	case SDLK_SCROLLLOCK:   return BX_KEY_SCRL_LOCK;
-	case SDLK_RSHIFT:       return BX_KEY_SHIFT_R;
-	case SDLK_LSHIFT:       return BX_KEY_SHIFT_L;
-	case SDLK_RCTRL:        return BX_KEY_CTRL_R;
-	case SDLK_LCTRL:        return BX_KEY_CTRL_L;
-	case SDLK_RALT:         return BX_KEY_ALT_R;
-	case SDLK_LALT:         return BX_KEY_ALT_L;
-	case SDLK_LGUI:         return BX_KEY_WIN_L;
-	case SDLK_RGUI:         return BX_KEY_WIN_R;
+	case SDL_SCANCODE_NUMLOCKCLEAR: return BX_KEY_NUM_LOCK;
+	case SDL_SCANCODE_CAPSLOCK:     return BX_KEY_CAPS_LOCK;
+	case SDL_SCANCODE_SCROLLLOCK:   return BX_KEY_SCRL_LOCK;
+	case SDL_SCANCODE_RSHIFT:       return BX_KEY_SHIFT_R;
+	case SDL_SCANCODE_LSHIFT:       return BX_KEY_SHIFT_L;
+	case SDL_SCANCODE_RCTRL:        return BX_KEY_CTRL_R;
+	case SDL_SCANCODE_LCTRL:        return BX_KEY_CTRL_L;
+	case SDL_SCANCODE_RALT:         return BX_KEY_ALT_R;
+	case SDL_SCANCODE_LALT:         return BX_KEY_ALT_L;
+	case SDL_SCANCODE_LGUI:         return BX_KEY_WIN_L;
+	case SDL_SCANCODE_RGUI:         return BX_KEY_WIN_R;
 
 		// Misc function keys
-	case SDLK_PRINTSCREEN:  return BX_KEY_PRINT;
-	case SDLK_MENU:         return BX_KEY_MENU;
+	case SDL_SCANCODE_PRINTSCREEN:  return BX_KEY_PRINT;
+	case SDL_SCANCODE_MENU:         return BX_KEY_MENU;
 
 	default:
-		BX_ERROR(("sdl3 keycode 0x%x not mapped", (unsigned)sym));
+		BX_ERROR(("sdl3 scancode 0x%x not mapped", (unsigned)sym));
 		return BX_KEY_UNHANDLED;
 	}
 }
@@ -525,7 +525,7 @@ void bx_sdl_gui_c::handle_events(void)
 			// convert sym -> bochs code
 			if (!myCfg->get_bool_value("keyboard.use_mapping", false))
 			{
-				key_event = sdl_sym_to_bx_key(sdl_event.key.key);
+				key_event = sdl_scan_to_bx_key(sdl_event.key.scancode);
 			}
 			else
 			{
@@ -590,7 +590,7 @@ void bx_sdl_gui_c::handle_events(void)
 
 			if (!myCfg->get_bool_value("keyboard.use_mapping", false))
 			{
-				key_event = sdl_sym_to_bx_key(sdl_event.key.key);
+				key_event = sdl_scan_to_bx_key(sdl_event.key.scancode);
 			}
 			else
 			{
