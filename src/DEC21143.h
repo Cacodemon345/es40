@@ -96,6 +96,7 @@
 #include "DEC21143_tulipreg.h"
 #if defined(WIN32)
 #define HAVE_REMOTE
+#include <winsock.h>
 #else
 #include <pcap.h>
 #endif
