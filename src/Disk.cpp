@@ -557,6 +557,7 @@ void CDisk::scsi_xfer_done_me(int bus)
 #define SCSICMD_MODE_SENSE            0x1a
 #define SCSICMD_START_STOP_UNIT       0x1b
 #define SCSICMD_PREVENT_ALLOW_REMOVE  0x1e
+#define SCSICMD_READ_SUBCHANNEL       0x42
 #define SCSICMD_MODE_SELECT_10        0x55
 #define SCSICMD_MODE_SENSE_10         0x5a
 #define SCSICMD_MAINTENANCE_IN        0xA3
@@ -795,6 +796,91 @@ static inline uint16_t read_16bit(const uint8_t* buf)
 	return (buf[0] << 8) | buf[1];
 }
 
+// some packet handling macros
+#define EXTRACT_FIELD(arr,byte,start,num_bits) (((arr)[(byte)] >> (start)) & ((1 << (num_bits)) - 1))
+#define get_packet_field(arr,b,s,n) (EXTRACT_FIELD((arr),(b),(s),(n)))
+#define get_packet_byte(arr,b) (arr[(b)])
+#define get_packet_word(arr,b) (((uint16_t)arr[(b)] << 8) | arr[(b)+1])
+
+// This, too, is straight out of Bochs.
+int read_sub_channel(uint8_t* buf, bool sub_q, bool msf, int start_track, int format, int alloc_length) {
+	int ret_len = 4;
+
+	buf[0] = 0;
+	buf[1] = 0; // audio status not supported
+	buf[2] = 0;
+	buf[3] = 4;
+
+	if (sub_q) { // !sub_q == header only
+		if (format == 1) {
+			buf[2] = 0;  // length (MSB -> LSB)
+			buf[3] = 12; // 
+
+			buf[4] = 1;  // format code = 1
+			buf[5] = (0 << 4) | (0 << 0); // ADR | CONTROL
+			buf[6] = 1;  // track number
+			buf[7] = 1;  // index number
+			if (msf) {
+				// in TIME format
+				uint32_t lba = /*BX_SELECTED_DRIVE(channel).cdrom.curr_lba*/ 0 + (2 * 75); // 150 = 2 second lead-in from start
+				int mins = (lba / 75) / 60;
+				int secs = (lba / 75) % 60;
+				int frames = lba % 75;
+				buf[8] = 0;  // Absolute CD Address (H = 0)
+				buf[9] = mins;  // M field (0 -> 99)
+				buf[10] = secs;  // S field (0 -> 59)
+				buf[11] = frames;  // F field (0 -> 74)
+				buf[12] = 0;  // Track Relative CD Address (H = 0)
+				buf[13] = mins;  // M field (0 -> 99)
+				buf[14] = secs;  // S field (0 -> 59)
+				buf[15] = frames;  // F field (0 -> 74)
+			}
+			else {
+				// LBA = (((M * 60) + S) * 75) + F - 150
+				// in LBA format
+				buf[8] = 0;  // Absolute CD Address (MSB -> LSB)
+				buf[9] = 0;  //
+				buf[10] = 0;  //
+				buf[11] = 1;  //
+				buf[12] = 0;  // Track Relative CD Address (MSB -> LSB)
+				buf[13] = 0;  //
+				buf[14] = 0;  //
+				buf[15] = 1;  //
+			}
+			ret_len = 16;
+
+		}
+		else if (format == 2) {
+			buf[3] = 20;
+			buf[4] = 2;
+			buf[8] = 0; // no MCN
+			memset(&buf[9], 0, 13);
+			buf[22] = 0; // zero
+			buf[23] = 0; // AFRAME (0 -> 4Ah)
+			ret_len = 24;
+
+		}
+		else if (format == 3) {
+			buf[3] = 20;
+			buf[4] = 3;
+			buf[5] = (1 << 4) | (4 << 0); // 0x14
+			buf[6] = 1;
+			buf[7] = 0; // reserved
+			buf[8] = 0; // no ISRC
+			memset(&buf[9], 0, 12);
+			buf[21] = 0; // zero
+			buf[22] = 0; // AFRAME (0 -> 4Ah)
+			buf[23] = 0; // reserved
+			ret_len = 24;
+		}
+		else {
+			ret_len = 0;
+		}
+	}
+
+	return ret_len;
+}
+
 /**
  * \brief Handle a SCSI command.
  *
@@ -861,6 +947,28 @@ int CDisk::do_scsi_command()
 		do_scsi_error(SCSI_OK);
 		break;
 	
+	case SCSICMD_READ_SUBCHANNEL:
+	{
+		bool msf = get_packet_field(state.scsi.cmd.data, 1, 1, 1);
+		bool sub_q = get_packet_field(state.scsi.cmd.data, 2, 6, 1);
+		uint8_t data_format = get_packet_byte(state.scsi.cmd.data, 3);
+		uint8_t track_number = get_packet_byte(state.scsi.cmd.data, 6);
+		uint16_t alloc_length = get_packet_word(state.scsi.cmd.data, 7);
+		// TODO: Return when empty CD drives are finally a thing again.
+		{
+			int ret_len = read_sub_channel(state.scsi.dati.data, sub_q, msf, track_number, data_format, alloc_length);
+			if (ret_len == 0)
+			{
+				do_scsi_error(SCSI_ILL_CMD);
+				break;
+			}
+			state.scsi.dati.available = ret_len;
+			state.scsi.dati.read = 0;
+			do_scsi_error(SCSI_OK);
+		}
+		break;
+	}
+
 	case SCSICMD_GET_EVENT_STATUS_NOTIFICATION:
 	{
 		if (!cdrom()) {
