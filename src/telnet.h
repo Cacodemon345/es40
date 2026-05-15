@@ -125,7 +125,8 @@
 #include <signal.h>
 #endif
 
-#if defined(_WIN32) && !defined(__GNUWIN32__)
+#if defined(_WIN32) && defined(_MSC_VER)
+typedef size_t        ssize_t;
 typedef int           socklen_t;
 #endif // _WIN32
 
