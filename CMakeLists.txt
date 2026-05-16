@@ -54,6 +54,10 @@ if (NOT ES40_DISABLE_NETWORKING)
     endif()
 endif()
 
+if (NOT ES40_DISABLE_SDL)
+    list(APPEND ES40_CFG_DEFINITIONS HAVE_SDL)
+endif()
+
 add_executable(es40-cfg 
     ${ES40_CFG_SOURCES}
     )
