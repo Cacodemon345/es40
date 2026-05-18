@@ -612,8 +612,9 @@ void CDisk::scsi_xfer_done_me(int bus)
 #define SCSI_INVALID_FIELD			- 4 /* Invalid field in CDB */
 #define SCSI_MEDIA_CHANGE           - 5 /* Media changed */
 #define SCSI_MEDIA_REMOVED          - 6 /* Media removed */
+#define SCSI_INVALID_LUN            - 7 /* Invalid LUN */
 
-void CDisk::do_scsi_error(int errcode)
+void CDisk::do_scsi_error(int errcode, int info = 0)
 {
 	state.scsi.stat.available = 1;
 	state.scsi.stat.data[0] = 0;
@@ -633,10 +634,10 @@ void CDisk::do_scsi_error(int errcode)
 	state.scsi.stat.data[0] = 0x02;       // check sense
 	state.scsi.sense.data[0] = 0xf0;      // error code
 	state.scsi.sense.data[1] = 0x00;      // segment number
-	state.scsi.sense.data[3] = 0x00;      // info
-	state.scsi.sense.data[4] = 0x00;
-	state.scsi.sense.data[5] = 0x00;
-	state.scsi.sense.data[6] = 0x00;
+	state.scsi.sense.data[3] = info >> 24;      // info
+	state.scsi.sense.data[4] = info >> 16;
+	state.scsi.sense.data[5] = info >> 8;
+	state.scsi.sense.data[6] = info & 0xFF;
 	state.scsi.sense.data[7] = 10;        // additional sense length
 	state.scsi.sense.data[8] = 0x00;      // command specific
 	state.scsi.sense.data[9] = 0x00;
@@ -669,6 +670,14 @@ void CDisk::do_scsi_error(int errcode)
 #endif
 		break;
 
+	case SCSI_INVALID_LUN:
+		state.scsi.sense.data[2] = 0x05;   // ILLEGAL REQUEST
+		state.scsi.sense.data[12] = 0x25;   // INVALID LUN
+		state.scsi.sense.data[13] = 0x00;
+#if defined(DEBUG_SCSI)
+		printf("%s: Check sense: INVALID LUN.\n", devid_string);
+#endif
+		break;
 
 	case SCSI_LBA_RANGE:
 		state.scsi.sense.data[2] = 0x05;    // illegal request
@@ -921,7 +930,8 @@ int CDisk::do_scsi_command()
 	if (state.scsi.lun_selected && state.scsi.cmd.data[0] != SCSICMD_INQUIRY
 		&& state.scsi.cmd.data[0] != SCSICMD_REQUEST_SENSE)
 	{
-		FAILURE_1(NotImplemented, "%s: LUN not supported!\n", devid_string);
+		do_scsi_error(SCSI_INVALID_FIELD, state.scsi.cmd.data[1] >> 5);
+		return 0;
 	}
 
 	switch (state.scsi.cmd.data[0])
