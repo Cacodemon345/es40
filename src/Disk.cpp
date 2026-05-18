@@ -614,7 +614,7 @@ void CDisk::scsi_xfer_done_me(int bus)
 #define SCSI_MEDIA_REMOVED          - 6 /* Media removed */
 #define SCSI_INVALID_LUN            - 7 /* Invalid LUN */
 
-void CDisk::do_scsi_error(int errcode, int info = 0)
+void CDisk::do_scsi_error(int errcode, int info)
 {
 	state.scsi.stat.available = 1;
 	state.scsi.stat.data[0] = 0;
